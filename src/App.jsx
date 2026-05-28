@@ -1358,9 +1358,16 @@ function App() {
 
 
   const deleteChat = (e, id) => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     const updatedChats = chats.filter(c => c.id !== id);
     setChats(updatedChats);
+    
+    // Also remove the deleted chat from any folders it might be in
+    setFolders(prev => prev.map(f => ({
+      ...f,
+      chatIds: f.chatIds ? f.chatIds.filter(chatId => chatId !== id) : []
+    })));
+
     if (currentChatId === id) {
       setCurrentChatId(null);
       setMessages([]);
@@ -1601,7 +1608,9 @@ function App() {
                     <span className="chat-title">
                       <HighlightText text={folder.name} query={chatSearchQuery} />
                     </span>
-                    <span className="folder-count">{(folder.chatIds?.length || 0) + childFolders.length}</span>
+                    {((folder.chatIds?.length || 0) + childFolders.length) > 0 && (
+                      <span className="folder-count">{(folder.chatIds?.length || 0) + childFolders.length}</span>
+                    )}
                   </div>
 
                   {isEffectivelyExpanded && (
@@ -1637,6 +1646,7 @@ function App() {
                                 {folders.filter(f => !folder || f.id !== folder.id).map(f => (
                                   <option key={f.id} value={f.id}>Move to {f.name}</option>
                                 ))}
+                                <option value="delete" className="danger-option">Delete Chat</option>
                               </select>
                             </div>
                           </div>
