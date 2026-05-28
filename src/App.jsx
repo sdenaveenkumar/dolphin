@@ -1561,10 +1561,7 @@ function App() {
 
         <div className="recent-chats">
           <div className="recent-chats-header">
-            <div className="recent-chats-title">Recent</div>
-            <button className="icon-btn tiny-btn" onClick={createNewChat} title="New Chat (Auto-folder)">
-              <Plus size={14} />
-            </button>
+            <div className="recent-chats-title">Folders</div>
             <button className="icon-btn tiny-btn" onClick={createFolder} title="Create Folder (Nested)">
               <Folder size={14} />
             </button>
@@ -1660,7 +1657,12 @@ function App() {
             return folders.filter(f => !f.parentId).map(f => renderFolder(f));
           })()}
 
-
+          <div className="recent-chats-header" style={{ marginTop: '1.5rem' }}>
+            <div className="recent-chats-title">All Chats</div>
+            <button className="icon-btn tiny-btn" onClick={createNewChat} title="New Chat">
+              <Plus size={14} />
+            </button>
+          </div>
 
           {/* Uncategorized Chats Grouped by Date */}
           {getChatGroups().map(([groupName, groupChats]) => {
