@@ -1249,6 +1249,7 @@ function App() {
     }
 
     abortControllerRef.current = new AbortController();
+    let streamMessages = [...newMessagesContext];
 
     try {
       const dynamicSystemPrompt = `${activePersona.prompt}\n\nUser Context:\n- Name: ${userName}\n- Role: ${userRole}\n- Bio: ${userBio}\n- Interests: ${userInterests}\n- Expertise: ${userExpertise}\n- Preferred Language: ${userLanguage}\n- Communication Style: ${userStyle}\n- Location: ${userLocation}\n- Age: ${userAge}`;
@@ -1284,7 +1285,7 @@ function App() {
       let chunkCount = 0;
 
       // Keep a reference to the conversation array for this active chat
-      let streamMessages = [...newMessagesContext, { role: 'assistant', content: '', stats: { tps: 0, words: 0 } }];
+      streamMessages = [...streamMessages, { role: 'assistant', content: '', stats: { tps: 0, words: 0 } }];
       saveMessageToChat(activeChatId, streamMessages);
 
       while (true) {
