@@ -1283,11 +1283,9 @@ function App() {
       let startTime = Date.now();
       let chunkCount = 0;
 
-      setMessages(prev => {
-        const appended = [...prev, { role: 'assistant', content: '', stats: { tps: 0, words: 0 } }];
-        saveMessageToChat(activeChatId, appended);
-        return appended;
-      });
+      // Keep a reference to the conversation array for this active chat
+      let streamMessages = [...newMessagesContext, { role: 'assistant', content: '', stats: { tps: 0, words: 0 } }];
+      saveMessageToChat(activeChatId, streamMessages);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1307,16 +1305,13 @@ function App() {
               const tps = elapsed > 0 ? (chunkCount / elapsed).toFixed(1) : 0;
               const words = botContent.trim().split(/\s+/).length;
 
-              setMessages(prev => {
-                const updated = [...prev];
-                updated[updated.length - 1] = {
-                  role: 'assistant',
-                  content: botContent,
-                  stats: { tps, words, time: elapsed.toFixed(1) }
-                };
-                saveMessageToChat(activeChatId, updated);
-                return updated;
-              });
+              streamMessages = [...streamMessages];
+              streamMessages[streamMessages.length - 1] = {
+                role: 'assistant',
+                content: botContent,
+                stats: { tps, words, time: elapsed.toFixed(1) }
+              };
+              saveMessageToChat(activeChatId, streamMessages);
             }
 
           } catch (e) {
@@ -1330,16 +1325,13 @@ function App() {
         console.log('Generation stopped by user');
       } else {
         console.error('Error:', error);
-        setMessages(prev => {
-          const updated = [...prev];
-          if (updated[updated.length - 1].role === 'assistant' && !updated[updated.length - 1].content) {
-            updated[updated.length - 1].content = '**Error:** Failed to connect to local LLM. Ensure Ollama is running.';
-          } else if (updated[updated.length - 1].role === 'user') {
-            updated.push({ role: 'assistant', content: '**Error:** Failed to connect.' });
-          }
-          saveMessageToChat(activeChatId, updated);
-          return updated;
-        });
+        streamMessages = [...streamMessages];
+        if (streamMessages[streamMessages.length - 1].role === 'assistant' && !streamMessages[streamMessages.length - 1].content) {
+          streamMessages[streamMessages.length - 1].content = '**Error:** Failed to connect to local LLM. Ensure Ollama is running.';
+        } else if (streamMessages[streamMessages.length - 1].role === 'user') {
+          streamMessages.push({ role: 'assistant', content: '**Error:** Failed to connect.' });
+        }
+        saveMessageToChat(activeChatId, streamMessages);
       }
     } finally {
       setIsTyping(false);
