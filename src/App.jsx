@@ -1351,6 +1351,7 @@ function App() {
     setCurrentChatId(null);
     setMessages([]);
     setInput('');
+    setUserHasScrolledUp(false);
     setPendingFolderId(expandedFolderIds[expandedFolderIds.length - 1] || null);
   };
 
@@ -1540,6 +1541,7 @@ function App() {
                   onClick={(e) => {
                     e.stopPropagation();
                     setCurrentChatId(chat.id);
+                    setUserHasScrolledUp(false);
                   }}
                 >
                   <MessageSquare size={14} />
@@ -1616,7 +1618,7 @@ function App() {
                         <div
                           key={chat.id}
                           className={`sidebar-item sub-item ${currentChatId === chat.id ? 'active' : ''}`}
-                          onClick={() => { setCurrentChatId(chat.id); setIsSettingsOpen(false); }}
+                          onClick={() => { setCurrentChatId(chat.id); setUserHasScrolledUp(false); setIsSettingsOpen(false); }}
                         >
                           <span className="chat-title">
                             <HighlightText text={chat.title} query={chatSearchQuery} />
@@ -1673,7 +1675,7 @@ function App() {
                 <div
                   key={chat.id}
                   className={`sidebar-item ${currentChatId === chat.id ? 'active' : ''}`}
-                  onClick={() => { setCurrentChatId(chat.id); setIsSettingsOpen(false); }}
+                  onClick={() => { setCurrentChatId(chat.id); setUserHasScrolledUp(false); setIsSettingsOpen(false); }}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
                     const folderId = e.target.closest('.folder-item')?.dataset.id;
